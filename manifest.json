@@ -1,0 +1,16 @@
+{
+  "name": "Dexly Pokedex",
+  "short_name": "Dexly",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f7f8fa",
+  "theme_color": "#203a43",
+  "description": "A mobile-friendly Pokedex with AI, camera scanning, and voice replies.",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}
