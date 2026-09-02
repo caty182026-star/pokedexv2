@@ -29,4 +29,4 @@
 .pokemon-card:nth-child(6) { animation-delay:.37s; }
 @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; } }
 .legacy-open { display:block; position:fixed; top:50%; left:50%; z-index:20; max-height:90vh; transform:translate(-50%,-50%); }
-@media (max-width:400px) { .scan-button,.download-button { padding-left:8px; padding-right:8px; } .scan-button-camera { display:none; } .top-actions { gap:4px; } .top-actions .icon-button { width:36px; height:36px; } }
+@media (max-width:400px) { .scan-button,.download-button { padding-left:8px; padding-right:8px; } .scan-button-camera { width:38px; height:38px; padding:0; justify-content:center; } .scan-button-camera b { display:none; } .top-actions { gap:4px; } .top-actions .icon-button { width:36px; height:36px; } }

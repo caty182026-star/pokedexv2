@@ -69,7 +69,7 @@ async function startCamera() {
   catch { scanResult.innerHTML = '<strong>Camera permission needed</strong><span>Allow camera access, or choose a photo below.</span>'; scanResult.hidden = false; }
 }
 function stopCamera() { if (cameraStream) cameraStream.getTracks().forEach(track => track.stop()); cameraStream = null; preview.srcObject = null; }
-document.querySelector('#scanButton').addEventListener('click', () => { openDialog(scanDialog); });
+document.querySelector('#scanButton').addEventListener('click', () => { openDialog(scanDialog); startCamera(); });
 document.querySelector('#startCamera').addEventListener('click', startCamera);
 document.querySelector('#captureImage').addEventListener('click', () => showScanEstimate(preview));
 document.querySelector('#photoInput').addEventListener('change', event => { const file = event.target.files[0]; if (!file) return; const image = new Image(); image.onload = () => showScanEstimate(image); image.src = URL.createObjectURL(file); });
