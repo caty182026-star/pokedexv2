@@ -136,12 +136,13 @@ voiceToggle.addEventListener('click', () => { voiceEnabled = !voiceEnabled; voic
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new Recognition(); recognition.lang = 'en-US'; recognition.interimResults = false; recognition.maxAlternatives = 1;
-  recognition.onstart = () => { micButton.classList.add('listening'); micButton.textContent = '◼'; };
+  recognition.onstart = () => { micButton.classList.add('listening'); document.querySelector('#talkButton').classList.add('listening'); document.querySelector('#talkButton').innerHTML = '<span>◼</span> Listening'; micButton.textContent = '◼'; };
   recognition.onresult = event => { chatInput.value = event.results[0][0].transcript; submitQuestion(chatInput.value); };
-  recognition.onend = () => { micButton.classList.remove('listening'); micButton.textContent = '●'; };
-  recognition.onerror = () => { micButton.classList.remove('listening'); micButton.textContent = '●'; };
+  recognition.onend = () => { micButton.classList.remove('listening'); document.querySelector('#talkButton').classList.remove('listening'); document.querySelector('#talkButton').innerHTML = '<span>●</span> Talk'; micButton.textContent = '●'; };
+  recognition.onerror = () => { micButton.classList.remove('listening'); document.querySelector('#talkButton').classList.remove('listening'); document.querySelector('#talkButton').innerHTML = '<span>●</span> Talk'; micButton.textContent = '●'; };
 } else { micButton.hidden = true; }
 micButton.addEventListener('click', () => { if (!recognition) return; if (micButton.classList.contains('listening')) recognition.stop(); else recognition.start(); });
+document.querySelector('#talkButton').addEventListener('click', () => micButton.click());
 
 const qrDialog = document.querySelector('#qrDialog');
 const appUrl = window.location.href;
