@@ -7,6 +7,7 @@ const palette = { grass:'#b8d9a5', fire:'#f7b09b', water:'#a8c9eb', electric:'#f
 let pokemon = []; let activeType = 'all'; let favorites = JSON.parse(localStorage.getItem('dexly-favorites') || '[]'); let favoritesOnly = false;
 const grid = document.querySelector('#pokemonGrid');
 const imageFor = id => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+const cardCatalog = [{ name:'Charizard ex', set:'Obsidian Flames · Ultra Rare', price:48.75, pokemonId:6 }, { name:'Pikachu VMAX', set:'Vivid Voltage · Secret Rare', price:32.4, pokemonId:25 }, { name:'Umbreon VMAX', set:'Evolving Skies · Alt Art', price:86.2, pokemonId:197 }, { name:'Mew ex', set:'151 · Special Illustration', price:21.9, pokemonId:151 }, { name:'Gengar ex', set:'Temporal Forces · Ultra Rare', price:14.5, pokemonId:94 }, { name:'Eevee promo', set:'Scarlet & Violet · Promo', price:8.25, pokemonId:133 }];
 function regionFor(id) { return id <= 151 ? 'kanto' : id <= 251 ? 'johto' : id <= 386 ? 'hoenn' : id <= 493 ? 'sinnoh' : id <= 649 ? 'unova' : id <= 721 ? 'kalos' : id <= 809 ? 'alola' : id <= 905 ? 'galar' : 'paldea'; }
 function makePokemon(item, index) { const [name, type, second, details] = item; const id = index + 1; return { id, name, types:details && details.types ? details.types : [type, ...(second ? [second] : [])], image:imageFor(id), region:regionFor(id), height:details ? `${(details.height / 10).toFixed(1)} m` : '0.7 m', weight:details ? `${(details.weight / 10).toFixed(1)} kg` : '6.9 kg', numericHeight:details && details.height || 7, numericWeight:details && details.weight || 69, abilities:details && details.abilities || [], moves:details && details.moves || [] }; }
 function openDialog(dialog) { if (dialog.showModal) dialog.showModal(); else { dialog.setAttribute('open', ''); dialog.className += ' legacy-open'; } }
@@ -126,6 +127,14 @@ document.querySelector('#shareButton').addEventListener('click', () => {
 document.querySelector('#closeQr').addEventListener('click', () => closeDialog(qrDialog));
 qrDialog.addEventListener('click', event => { if (event.target === event.currentTarget) closeDialog(event.currentTarget); });
 document.querySelector('#copyUrl').addEventListener('click', async event => { try { await navigator.clipboard.writeText(appUrl); event.currentTarget.textContent = 'Link copied'; window.setTimeout(() => { event.currentTarget.textContent = 'Copy link'; }, 1600); } catch { event.currentTarget.textContent = 'Copy unavailable'; } });
+
+const valueDialog = document.querySelector('#valueDialog');
+const cardList = document.querySelector('#cardList');
+function renderCards() { const query = document.querySelector('#cardSearch').value.toLowerCase(); const cards = cardCatalog.filter(card => card.name.toLowerCase().includes(query)); document.querySelector('#valueTotal').textContent = `$${cardCatalog.reduce((total, card) => total + card.price, 0).toFixed(2)}`; cardList.innerHTML = cards.map(card => `<div class="card-row"><img src="${imageFor(card.pokemonId)}" alt="${card.name}"><div><strong>${card.name}</strong><span>${card.set}</span></div><b class="card-price">$${card.price.toFixed(2)}</b></div>`).join(''); }
+document.querySelector('#valueButton').addEventListener('click', () => { renderCards(); openDialog(valueDialog); });
+document.querySelector('#closeValue').addEventListener('click', () => closeDialog(valueDialog));
+valueDialog.addEventListener('click', event => { if (event.target === event.currentTarget) closeDialog(valueDialog); });
+document.querySelector('#cardSearch').addEventListener('input', renderCards);
 
 let installPrompt;
 window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); installPrompt = event; });
