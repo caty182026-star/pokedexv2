@@ -97,7 +97,7 @@ function answerQuestion(question) {
   return 'I can tell you about a Pokémon, explain type matchups, or suggest a starter. Try asking “Tell me about Eevee”.';
 }
 function submitQuestion(question) { const trimmed = question.trim(); if (!trimmed) return; addChatMessage(trimmed, 'user'); chatInput.value = ''; window.setTimeout(() => addChatMessage(answerQuestion(trimmed), 'assistant'), 180); }
-document.querySelector('#aiButton').addEventListener('click', () => { openDialog(aiDialog); chatInput.focus(); });
+document.querySelector('#aiButton').addEventListener('click', () => { openDialog(aiDialog); playPokedexChime(false); chatInput.focus(); });
 document.querySelector('#closeAi').addEventListener('click', () => closeDialog(aiDialog));
 aiDialog.addEventListener('click', event => { if (event.target === event.currentTarget) closeDialog(event.currentTarget); });
 document.querySelector('#chatForm').addEventListener('submit', event => { event.preventDefault(); submitQuestion(chatInput.value); });
@@ -105,12 +105,21 @@ document.querySelector('.suggestions').addEventListener('click', event => { cons
 
 let voiceEnabled = false;
 let recognition;
+let audioContext;
 const voiceToggle = document.querySelector('#voiceToggle');
 const voiceStatus = document.querySelector('#voiceStatus');
 const micButton = document.querySelector('#micButton');
+function playPokedexChime(replyTone) {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext; if (!AudioContextClass) return;
+  audioContext = audioContext || new AudioContextClass(); if (audioContext.state === 'suspended') audioContext.resume();
+  const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain(); const start = audioContext.currentTime;
+  oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(replyTone ? 660 : 520, start); oscillator.frequency.exponentialRampToValueAtTime(replyTone ? 990 : 780, start + 0.12);
+  gain.gain.setValueAtTime(0.0001, start); gain.gain.exponentialRampToValueAtTime(0.08, start + 0.02); gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.24);
+  oscillator.connect(gain); gain.connect(audioContext.destination); oscillator.start(start); oscillator.stop(start + 0.25);
+}
 function speakReply(message) { if (!voiceEnabled || !('speechSynthesis' in window)) return; window.speechSynthesis.cancel(); const utterance = new SpeechSynthesisUtterance(message); utterance.rate = 0.96; utterance.pitch = 1.05; window.speechSynthesis.speak(utterance); }
 const originalAddChatMessage = addChatMessage;
-addChatMessage = (message, role) => { originalAddChatMessage(message, role); if (role === 'assistant') speakReply(message); };
+addChatMessage = (message, role) => { originalAddChatMessage(message, role); if (role === 'assistant') { playPokedexChime(true); speakReply(message); } };
 voiceToggle.addEventListener('click', () => { voiceEnabled = !voiceEnabled; voiceToggle.textContent = voiceEnabled ? '🔊' : '🔇'; voiceToggle.classList.toggle('on', voiceEnabled); voiceToggle.setAttribute('aria-label', voiceEnabled ? 'Turn AI voice off' : 'Turn AI voice on'); voiceStatus.hidden = !voiceEnabled; if (voiceEnabled) speakReply('Voice replies are on. Ask me anything about Pokémon.'); else if (window.speechSynthesis) window.speechSynthesis.cancel(); });
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
